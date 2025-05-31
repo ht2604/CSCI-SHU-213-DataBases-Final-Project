@@ -1,7 +1,8 @@
-# CSCI-SHU-213-DataBases-Final-Project Spring 2025
+# CSCI-SHU-213-DataBases-Final-Project Spring 2025 ![屏幕截图 2025-05-31 155341](https://github.com/user-attachments/assets/696ca144-fc1c-4012-9708-ceb0a3c8e7dc)
+
 Online Air Ticket Booking System
 
-![Uploading 屏幕截图 2025-05-31 155341.png…]()
+
 
 
 Collaborator: He(Helen) Tu & Xiangjia Lei
