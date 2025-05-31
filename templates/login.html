@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <style>
+        body {
+            background-image: url('https://source.unsplash.com/1600x900/?airplane,sky'); 
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .login-form {
+            padding: 40px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .login-header::before {
+            content: "✈️";
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            border-radius: 50px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+        }
+
+        .radio-buttons label {
+            font-weight: 500;
+        }
+
+        #email-field,
+        #username-field {
+            transition: opacity 0.3s ease;
+        }
+
+        .flash-messages li {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="card-body login-form">
+            <h2 class="login-header">Login</h2>
+            
+            <!-- Flash messages for login status -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    <ul>
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% endwith %}
+        
+            <form method="POST" action="{{ url_for('login') }}">
+                <!-- Identity selection buttons -->
+                <label for="identity" class="form-label">Login as:</label>
+                <div class="radio-buttons">
+                    <label><input type="radio" id="customer" name="identity" value="Customer" required checked> Customer</label>
+                    <label><input type="radio" id="agent" name="identity" value="BookingAgent" required> Booking Agent</label>
+                    <label><input type="radio" id="staff" name="identity" value="AirlineStaff" required> Airline Staff</label>
+                </div>
+            
+                <!-- Email field (shown by default) -->
+                <div class="form-group" id="email-field">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                </div>
+                
+                <!-- Username field (hidden by default) -->
+                <div class="form-group" id="username-field">
+                    <label for="username" class="form-label">Username:</label>
+                    <input type="text" id="username" name="username" class="form-control">
+                </div>
+            
+                <div class="form-group">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+            
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+            <p class="text-center mt-3">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        // 页面加载时检测是否是后退
+        if (window.performance && window.performance.navigation.type === 2) {
+            // 如果用户通过后退按钮访问当前页面
+            window.location.reload(true); // 强制刷新页面
+        }
+
+        $(document).ready(function() {
+            // 初始化时处理默认状态
+            updateFormFields();
+            
+            // 身份切换时更新字段
+            $('input[name="identity"]').change(function() {
+                updateFormFields();
+            });
+            
+            function updateFormFields() {
+                const isStaff = $('input[name="identity"]:checked').val() === 'AirlineStaff';
+                
+                if (isStaff) {
+                    // Staff模式：显示username，隐藏email
+                    $('#email-field').hide();
+                    $('#email').removeAttr('required').removeAttr('name'); // 移除name属性
+                    $('#username-field').show();
+                    $('#username').attr('required', 'required').attr('name', 'username');
+                } else {
+                    // 其他模式：显示email，隐藏username
+                    $('#email-field').show();
+                    $('#email').attr('required', 'required').attr('name', 'email');
+                    $('#username-field').hide();
+                    $('#username').removeAttr('required').removeAttr('name');
+                }
+            }
+        });
+    </script>
+
+
+
+
+    
+
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Online Air Ticket Reservation System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap & FontAwesome -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      background-color: #f0f8ff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: white;
+    }
+
+    .top-bar .icon {
+      font-size: 24px;
+      color: #007bff;
+      font-weight: bold;
+    }
+
+    .top-bar .links a {
+      margin-left: 20px;
+      color: #007bff;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .hero-banner {
+      width: 100%;
+      height: 400px;
+      background-image: url('{{ url_for("static", filename="plane-image.png") }}');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .hero-banner h1, .hero-banner p {
+      position: absolute;
+      color: black;
+      text-align: center;
+      left: 50%;
+      transform: translateX(-50%);
+      text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+    }
+
+    .hero-banner h1 {
+      top: 20%;
+      font-size: 44px;
+      font-weight: bold;
+    }
+
+    .hero-banner p {
+      top: 34%;
+      font-size: 18px;
+    }
+
+    .info-text {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 600;
+      color: #333;
+      margin-top: 25px;
+      margin-bottom: 10px;
+      padding: 0 20px;
+    }
+
+    .features {
+      margin: 25px auto 40px;
+      max-width: 1000px;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 20px 15px;
+      margin: 10px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      transition: 0.3s;
+      height: auto;
+      min-height: 220px;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
+
+    .feature-icon {
+      font-size: 30px;
+      color: #007bff;
+      margin-bottom: 10px;
+    }
+
+    .feature-card h5 {
+      font-weight: bold;
+      margin-bottom: 10px;
+      white-space: nowrap;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: #555;
+      min-height: 35px;
+    }
+
+    .feature-card a.btn {
+      margin-top: 8px;
+      width: 100%;
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 767px) {
+      .hero-banner h1 {
+        font-size: 32px;
+      }
+      .feature-card {
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 顶部导航栏 -->
+  <div class="top-bar">
+    <div class="icon">
+      <i class="fas fa-plane-departure"></i> Flight Concierge
+    </div>
+    <div class="links">
+      <a href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('register') }}">Register</a>
+    </div>
+  </div>
+
+  <!-- 欢迎横幅 -->
+  <div class="hero-banner">
+    <h1>Welcome to Your Flight Concierge</h1>
+    <p>Check flights, status, and plan easily.</p>
+  </div>
+
+  <!-- 公共信息介绍 -->
+  <div class="container info-text">
+    <p><i class="fas fa-info-circle"></i> <strong>General Public Information:</strong> You can browse public features without logging in.</p>
+  </div>
+
+  <!-- 功能按钮 -->
+  <div class="container features">
+    <div class="row justify-content-center">
+
+      <div class="col-md-6 d-flex">
+        <div class="feature-card w-100">
+          <div class="feature-icon"><i class="fas fa-plane-departure"></i></div>
+          <h5>Search for Upcoming Flights</h5>
+          <p>Find flights by city or airport.</p>
+          <a href="{{ url_for('flight_search') }}" class="btn btn-outline-primary">Search Flights</a>
+        </div>
+      </div>
+
+      <div class="col-md-6 d-flex">
+        <div class="feature-card w-100">
+          <div class="feature-icon"><i class="fas fa-clock"></i></div>
+          <h5>Check Flight Status</h5>
+          <p>Track flights by number and date.</p>
+          <a href="{{ url_for('flight_status') }}" class="btn btn-outline-primary">Check Status</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>
+
+
+
+

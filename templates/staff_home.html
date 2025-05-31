@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airline Staff Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+
+    <script>
+      // 页面加载时检测是否是后退
+      if (window.performance && window.performance.navigation.type === 2) {
+          // 如果用户通过后退按钮访问当前页面
+          window.location.reload(true); // 强制刷新页面
+      }
+    </script>
+
+
+
+
+    <style>
+        .feature-btn {
+            height: 100px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .feature-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .admin-feature {
+            border-left: 4px solid #dc3545;
+        }
+        .operator-feature {
+            border-left: 4px solid #17a2b8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Welcome, {{ session["username"] }}!</h1>
+        <form action="{{ url_for('logout') }}" method="POST" class="mb-0">
+            <button type="submit" class="btn btn-danger mx-2">Logout</button>
+        </form>
+    </div>
+    
+    <div class="alert alert-info">
+        <strong>Airline:</strong> {{ session.get('airline', 'Unknown Airline') }} | 
+        <strong>Role:</strong> {{ session.get("role", "Staff") }} | 
+        <strong>Permissions:</strong> 
+        {% if "Admin" in session.permissions %}<span class="badge badge-danger">Admin</span>{% endif %}
+        {% if "Operator" in session.permissions %}<span class="badge badge-info">Operator</span>{% endif %}
+    </div>
+
+    <!-- Flight Management Section -->
+    <h3 class="mt-5 border-bottom pb-2">Flight Management</h3>
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <a href="{{ url_for('view_flights') }}" class="btn btn-outline-primary btn-block feature-btn">
+                <div>
+                    <i class="fas fa-plane-departure fa-2x mb-2"></i>
+                    <h5>View My Flights</h5>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-4">
+            <a href="{{ url_for('create_flight') }}" class="btn btn-outline-success btn-block feature-btn {% if 'Admin' not in session.permissions %}disabled{% endif %} admin-feature">
+                <div>
+                    <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                    <h5>Create New Flight</h5>
+                    {% if 'Admin' not in session.permissions %}<small class="text-muted">Admin Only</small>{% endif %}
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-4">
+            <a href="{{ url_for('change_flight_status') }}" class="btn btn-outline-warning btn-block feature-btn {% if 'Operator' not in session.permissions %}disabled{% endif %} operator-feature">
+                <div>
+                    <i class="fas fa-exchange-alt fa-2x mb-2"></i>
+                    <h5>Change Flight Status</h5>
+                    {% if 'Operator' not in session.permissions %}<small class="text-muted">Operator Only</small>{% endif %}
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- System Management Section -->
+    <h3 class="mt-5 border-bottom pb-2">System Management</h3>
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <a href="{{ url_for('add_airplane') }}" class="btn btn-outline-secondary btn-block feature-btn {% if 'Admin' not in session.permissions %}disabled{% endif %} admin-feature">
+                <div>
+                    <i class="fas fa-plane fa-2x mb-2"></i>
+                    <h5>Add Airplane</h5>
+                    {% if 'Admin' not in session.permissions %}<small class="text-muted">Admin Only</small>{% endif %}
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-4">
+            <a href="{{ url_for('add_airport') }}" class="btn btn-outline-secondary btn-block feature-btn {% if 'Admin' not in session.permissions %}disabled{% endif %} admin-feature">
+                <div>
+                    <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                    <h5>Add Airport</h5>
+                    {% if 'Admin' not in session.permissions %}<small class="text-muted">Admin Only</small>{% endif %}
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-4">
+            <a href="{{ url_for('add_booking_agent') }}" class="btn btn-outline-secondary btn-block feature-btn {% if 'Admin' not in session.permissions %}disabled{% endif %} admin-feature">
+                <div>
+                    <i class="fas fa-user-tie fa-2x mb-2"></i>
+                    <h5>Add Booking Agent</h5>
+                    {% if 'Admin' not in session.permissions %}<small class="text-muted">Admin Only</small>{% endif %}
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Reports & Analytics Section -->
+    <h3 class="mt-5 border-bottom pb-2">Reports & Analytics</h3>
+    <div class="row mt-3">
+        <div class="col-md-3">
+            <a href="{{ url_for('view_agents') }}" class="btn btn-outline-info btn-block feature-btn">
+                <div>
+                    <i class="fas fa-chart-line fa-2x mb-2"></i>
+                    <h5>View Booking Agents</h5>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-3">
+            <a href="{{ url_for('frequent_customers') }}" class="btn btn-outline-info btn-block feature-btn">
+                <div>
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h5>Frequent Customers</h5>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-3">
+            <a href="{{ url_for('staff_view_report') }}" class="btn btn-outline-info btn-block feature-btn">
+                <div>
+                    <i class="fas fa-file-alt fa-2x mb-2"></i>
+                    <h5>View Reports</h5>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-3">
+            <a href="{{ url_for('staff_revenue_comparison') }}" class="btn btn-outline-info btn-block feature-btn">
+                <div>
+                    <i class="fas fa-money-bill-wave fa-2x mb-2"></i>
+                    <h5>Revenue Comparison</h5>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Additional Features -->
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <a href="{{ url_for('staff_top_destination') }}" class="btn btn-outline-dark btn-block feature-btn">
+                <div>
+                    <i class="fas fa-globe-americas fa-2x mb-2"></i>
+                    <h5>Top Destinations</h5>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-4">
+            <a href="{{ url_for('grant_permission') }}" class="btn btn-outline-danger btn-block feature-btn {% if 'Admin' not in session.permissions %}disabled{% endif %} admin-feature">
+                <div>
+                    <i class="fas fa-user-shield fa-2x mb-2"></i>
+                    <h5>Grant Permissions</h5>
+                    {% if 'Admin' not in session.permissions %}<small class="text-muted">Admin Only</small>{% endif %}
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Font Awesome for Icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<!-- Bootstrap Scripts -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html> 
+

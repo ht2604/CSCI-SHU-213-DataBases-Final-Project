@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frequent Customers</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .badge-custom {
+            font-size: 1rem;
+            padding: 8px 12px;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .customer-profile {
+            background-color: #f8faff;
+            border-left: 4px solid #4e73df;
+            padding: 15px;
+        }
+        .export-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Navigation -->
+        <div class="d-flex justify-content-between mb-4">
+            <a href="{{ url_for('staff_home') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-users"></i> Frequent Customers</h2>
+            <div class="alert alert-info mb-0">
+                <strong>Airline:</strong> {{ airline }}
+            </div>
+        </div>
+
+        <!-- Most Frequent Customer -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-crown"></i> Top Frequent Customer (Past Year)</h4>
+            </div>
+            <div class="card-body">
+                {% if most_freq_customer %}
+                <div class="customer-profile">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3>{{ most_freq_customer[0]['name'] }}</h3>
+                            <p class="mb-1">
+                                <strong><i class="fas fa-envelope"></i> Email:</strong> {{ most_freq_customer[0]['email'] }}
+                            </p>
+                            <p class="mb-1">
+                                <strong><i class="fas fa-map-marker-alt"></i> Address:</strong> 
+                                {{ most_freq_customer[0]['building_number'] }}, {{ most_freq_customer[0]['street'] }}, {{ most_freq_customer[0]['city'] }}, {{ most_freq_customer[0]['state'] }}
+                            </p>
+                            <p class="mb-1">
+                                <strong><i class="fas fa-phone"></i> Phone:</strong> {{ most_freq_customer[0]['phone_number'] }}
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <div class="display-4">{{ most_freq_customer[0]['flight_count'] }}</div>
+                            <span class="badge badge-primary badge-custom">Total Flights</span>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">No frequent customer data available</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Customer Flight History -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-plane"></i> Customer Flight History</h4>
+            </div>
+            <div class="card-body">
+                <form id="customerSearchForm" class="mb-4" method="GET" action="{{ url_for('frequent_customers') }}">
+                    <div class="form-row align-items-center">
+                        <div class="col-md-9">
+                            <select class="form-control" id="customerEmail" name="email" required>
+                                <option value="">Select Customer...</option>
+                                {% for cust in customers %}
+                                <option value="{{ cust['email'] }}" {% if selected_email == cust['email'] %}selected{% endif %}>
+                                    {{ cust['name'] }} ({{ cust['email'] }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-search"></i> Search Flights
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div id="customerFlightsResult">
+                    {% if history %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Ticket ID</th>
+                                    <th>Flight #</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Departure</th>
+                                    <th>Arrival</th>
+                                    <th>Status</th>
+                                    <th>Price ($)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for flight in history %}
+                                <tr>
+                                    <td>{{ flight['ticket_id'] }}</td>
+                                    <td>{{ flight['flight_num'] }}</td>
+                                    <td>{{ flight['departure_airport'] }}</td>
+                                    <td>{{ flight['arrival_airport'] }}</td>
+                                    <td>{{ flight['departure_time'] }}</td>
+                                    <td>{{ flight['arrival_time'] }}</td>
+                                    <td>{{ flight['status'] }}</td>
+                                    <td>{{ flight['price'] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% elif selected_email %}
+                    <div class="alert alert-warning text-center">
+                        <i class="fas fa-info-circle"></i> No flight history found for {{ selected_email }}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-light text-center">
+                        <i class="fas fa-info-circle"></i> Select a customer to view their flight history with {{ airline }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export to Excel Button -->
+    <button id="exportExcel" class="btn btn-success export-btn" title="Export to Excel">
+        <i class="fas fa-file-excel"></i> Export
+    </button>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sheetjs/xlsx.full.min.js"></script>
+    
+    
+
+        <script>
+            document.getElementById('exportExcel').addEventListener('click', function () {
+                var wb = XLSX.utils.book_new();
+
+                // 导出 Top Customer 信息
+                if (document.querySelector('.customer-profile')) {
+                    var customerData = [
+                        ["Top Frequent Customer (Past Year)"],
+                        ["Name", "{{ most_freq_customer[0]['name'] if most_freq_customer else 'N/A' }}"],
+                        ["Email", "{{ most_freq_customer[0]['email'] if most_freq_customer else 'N/A' }}"],
+                        ["Address", "{{ most_freq_customer[0]['building_number'] if most_freq_customer else 'N/A' }}, {{ most_freq_customer[0]['street'] if most_freq_customer else 'N/A' }}, {{ most_freq_customer[0]['city'] if most_freq_customer else 'N/A' }}, {{ most_freq_customer[0]['state'] if most_freq_customer else 'N/A' }}"],
+                        ["Phone", "{{ most_freq_customer[0]['phone_number'] if most_freq_customer else 'N/A' }}"],
+                        ["Total Flights", "{{ most_freq_customer[0]['flight_count'] if most_freq_customer else '0' }}"]
+                    ];
+                    var ws = XLSX.utils.aoa_to_sheet(customerData);
+                    XLSX.utils.book_append_sheet(wb, ws, "Top Customer");
+                }
+
+                // 导出顾客邮箱列表
+                var customerList = [["Customer Email", "Customer Name"]];
+                {% for cust in customers %}
+                customerList.push(["{{ cust['email'] }}", "{{ cust['name'] }}"]);
+                {% endfor %}
+                var ws2 = XLSX.utils.aoa_to_sheet(customerList);
+                XLSX.utils.book_append_sheet(wb, ws2, "All Customers");
+
+                // 导出航班表格
+                var flightTable = document.querySelector('#customerFlightsResult table');
+                if (flightTable) {
+                    var ws3 = XLSX.utils.table_to_sheet(flightTable);
+                    XLSX.utils.book_append_sheet(wb, ws3, "Flight History");
+                }
+
+                XLSX.writeFile(wb, 'Frequent_Customers_Report.xlsx');
+            });
+        </script>
+    });
+    </script>
+</body>
+</html>

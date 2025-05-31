@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search & Purchase Flights</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="text-center">Search & Purchase Flights</h1>
+
+    <!-- Flight Search Form -->
+    <form method="POST" class="mt-4">
+        <input type="hidden" name="action" value="search"> <!-- 告诉后端：这是搜索请求 -->
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="departure_city">From City:</label>
+                <input type="text" name="departure_city" class="form-control">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="departure_airport">From Airport:</label>
+                <input type="text" name="departure_airport" class="form-control">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="arrival_city">To City:</label>
+                <input type="text" name="arrival_city" class="form-control">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="arrival_airport">To Airport:</label>
+                <input type="text" name="arrival_airport" class="form-control">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="flight_date">Flight Date:</label>
+                <input type="date" name="flight_date" class="form-control">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Search</button>
+    </form>
+
+    <!-- Error message -->
+    {% if error %}
+    <div class="alert alert-danger mt-3">{{ error }}</div>
+    {% endif %}
+
+    <!-- Display customer balance -->
+    {% if balance is not none %}
+    <div class="alert alert-info mt-3">
+        <strong>Current Balance: </strong>{{ balance }}
+    </div>
+    {% endif %}
+
+    <!-- Search Results -->
+    {% if search_results %}
+    <h3 class="mt-5">Search Results</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead class="thead-light">
+                <tr>
+                    <th>Airline</th>
+                    <th>Flight #</th>
+                    <th>Departure</th>
+                    <th>Departure Time</th>
+                    <th>Arrival</th>
+                    <th>Arrival Time</th>
+                    <th>Available Seats</th>
+                    <th>Price</th>
+                    <th>Status</th>
+
+                    <th>Buy</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in search_results %}
+                <tr>
+                    <td>{{ f[0] }}</td>
+                    <td>{{ f[1] }}</td>
+                    <td>{{ f[2] }}</td>
+                    <td>{{ f[3] }}</td>
+                    <td>{{ f[4] }}</td>
+                    <td>{{ f[5] }}</td>
+                    <td>{{ f[11] }}</td>
+                    <td>{{ f[6] }}</td>
+                    <td>{{ f[7] }}</td>
+                    
+                    <td>
+                        {% if balance >= f[7]|float %}
+                        <form method="POST" style="margin:0;">
+                            <input type="hidden" name="action" value="purchase"> <!-- 告诉后端：这是购买请求 -->
+                            <input type="hidden" name="airline_name" value="{{ f[0] }}">
+                            <input type="hidden" name="flight_num" value="{{ f[1] }}">
+                            <button type="submit" class="btn btn-sm btn-success">Buy</button>
+                        </form>
+                        {% else %}
+                        <span class="text-danger">Insufficient balance, go to work first!</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="alert alert-warning text-center mt-3">No flights match your search.</div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="text-center mt-5">
+        <a href="{{ url_for('customer_home') }}" class="btn btn-secondary">Back to Home</a>
+    </div>
+</div>
+
+<!-- Bootstrap Scripts -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+

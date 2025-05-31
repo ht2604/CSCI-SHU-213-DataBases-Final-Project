@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Search</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="text-center">Search for Upcoming Flights</h1>
+    
+    <!-- Flight Search Form -->
+    <form method="POST">
+        <!-- Departure City -->
+        <div class="form-group">
+            <label for="departure_city">Departure City:</label>
+            <select id="departure_city" name="departure_city" class="form-control">
+                <option value="all">All</option>
+                {% for city in departure_city %}
+                    <option value="{{ city[0] }}">{{ city[0] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Departure Airport -->
+        <div class="form-group">
+            <label for="departure_airport">Departure Airport:</label>
+            <select id="departure_airport" name="departure_airport" class="form-control">
+                <option value="all">All</option>
+                {% for airport in departure_airport %}
+                    <option value="{{ airport[0] }}">{{ airport[0] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Arrival City -->
+        <div class="form-group">
+            <label for="arrival_city">Arrival City:</label>
+            <select id="arrival_city" name="arrival_city" class="form-control">
+                <option value="all">All</option>
+                {% for city in arrival_city %}
+                    <option value="{{ city[0] }}">{{ city[0] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Arrival Airport -->
+        <div class="form-group">
+            <label for="arrival_airport">Arrival Airport:</label>
+            <select id="arrival_airport" name="arrival_airport" class="form-control">
+                <option value="all">All</option>
+                {% for airport in arrival_airport %}
+                    <option value="{{ airport[0] }}">{{ airport[0] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Flight Date -->
+        <div class="form-group">
+            <label for="flight_date">Date of Travel:</label>
+            <input type="date" id="flight_date" name="flight_date" class="form-control" value="{{ flight_date }}">
+        </div>
+    
+        <button type="submit" class="btn btn-primary btn-block">Search Flights</button>
+    </form>
+    
+    <!-- Display Flight Search Results -->
+    
+    {% if flights is not none %}
+    <div id="search-results" class="mt-5">
+        <h2 class="text-center">Flight Search Results</h2>
+
+        {% if not flights %}
+            <div class="alert alert-warning text-center">
+                No upcoming flights based on your search.
+            </div>
+        {% else %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Flight Number</th>
+                        <th>Departure</th>
+                        <th>Destination</th>
+                        <th>Date</th>
+                        <th>Departure Time</th>
+                        <th>Arrival Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for flight in flights %}
+                        <tr>
+                            <td>{{ flight.flight_number }}</td>
+                            <td>{{ flight.source }}</td>
+                            <td>{{ flight.destination }}</td>
+                            <td>{{ flight.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>  <!-- 完整的日期和时间 -->
+                            <td>{{ flight.departure_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>  <!-- 完整的日期和时间 -->
+                            <td>{{ flight.arrival_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>  <!-- 完整的日期和时间 -->
+                            <td>{{ flight.status }}</td> <!-- 显示航班状态 -->
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+    {% endif %}
+
+
+    <!-- Redirect to Initial Page -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Redirect to Initial Page</a>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>

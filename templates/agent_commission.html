@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Commission Statistics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Commission Earned</h1>
+        <a href="{{ url_for('agent_home') }}" class="btn btn-primary">
+            ← Return to Home
+        </a>
+    </div>
+
+    <form method="POST" class="mb-5">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Start Date:</label>
+                <input type="date" name="start_date" class="form-control" value="{{ start_date }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">End Date:</label>
+                <input type="date" name="end_date" class="form-control" value="{{ end_date }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">View Commission</button>
+    </form>
+
+    <h3 class="mb-3">Results ({{ start_date }} to {{ end_date }})</h3>
+    <ul class="list-group mb-4">
+        <li class="list-group-item"><strong>Total Tickets Sold:</strong> {{ total_tickets }}</li>
+        <li class="list-group-item"><strong>Total Commission:</strong> ${{ total_commission }}</li>
+        <li class="list-group-item"><strong>Average Commission per Ticket:</strong> ${{ avg_commission }}</li>
+    </ul>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-danger">
+          {% for msg in messages %}
+            <p class="mb-0">{{ msg }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+</body>
+</html>

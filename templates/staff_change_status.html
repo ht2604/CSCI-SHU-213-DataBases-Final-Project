@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change Flight Status</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .status-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .status-badge {
+            font-size: 1rem;
+            padding: 8px 12px;
+        }
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Back Button -->
+        <a href="{{ url_for('staff_home') }}" class="btn btn-outline-secondary mb-4">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Change Flight Status</h2>
+            <div class="alert alert-info mb-0">
+                <strong>Airline:</strong> {{ airline }}
+            </div>
+        </div>
+
+        <!-- Current Status Display -->
+        <div class="card status-card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Current Flight Status</h5>
+            </div>
+            <div class="card-body">
+                <div id="currentStatusContainer">
+                    <!-- Status will be loaded here via AJAX -->
+                    <p class="text-muted">Select a flight to view current status</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Change Form -->
+        <div class="card status-card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Update Flight Status</h5>
+            </div>
+            <div class="card-body form-section">
+                <form id="statusForm">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="flightSelect">Flight Number</label>
+                            <select class="form-control" id="flightSelect" required>
+                                <option value="">Select Flight</option>
+                                {% for num in flight_num %}
+                                <option value="{{ num[0] }}">{{ num[0] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="statusSelect">New Status</label>
+                            <select class="form-control" id="statusSelect" required>
+                                <option value="">Select Status</option>
+                                <option value="Upcoming">Upcoming</option>
+                                <option value="Delayed">Delayed</option>
+                                <option value="In Progress">In Progress</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group">
+                        <label for="statusReason">Reason (Optional)</label>
+                        <textarea class="form-control" id="statusReason" rows="2" 
+                                  placeholder="Enter reason for status change"></textarea>
+                    </div> -->
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Status
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+    $(document).ready(function() {
+        // Load current status when flight is selected
+        $('#flightSelect').change(function() {
+            var flightNum = $(this).val();
+            if (flightNum) {
+                $.get('/get_flight_status?flight_num=' + flightNum, function(data) {
+                    $('#currentStatusContainer').html(`
+                        <div class="d-flex align-items-center">
+                            <h5 class="mb-0 mr-3">Flight: # ${flightNum}</h5>
+                            <span class="badge ${getStatusBadgeClass(data.status)} status-badge">
+                                ${data.status}
+                            </span>
+                        </div>
+                        ${data.reason ? `<p class="mt-2 mb-0"><strong>Reason:</strong> ${data.reason}</p>` : ''}
+                        <p class="mt-2 mb-0"><small class="text-muted">
+                            Last updated: ${data.last_updated}
+                        </small></p>
+                    `);
+                });
+            } else {
+                $('#currentStatusContainer').html('<p class="text-muted">Select a flight to view current status</p>');
+            }
+        });
+
+        // Handle form submission
+        $('#statusForm').submit(function(e) {
+            e.preventDefault();
+            
+            var flightNum = $('#flightSelect').val();
+            var newStatus = $('#statusSelect').val();
+           
+            $.post('/update_flight_status', {
+                flight_num: flightNum,
+                new_status: newStatus,
+                // reason: reason
+            }, function(response) {
+                alert(response.message);
+                // Refresh current status display
+                $('#flightSelect').trigger('change');
+                // Reset form
+                $('#statusSelect').val('');
+                $('#statusReason').val('');
+            }).fail(function(xhr) {
+                alert(xhr.responseJSON.error || 'Error updating status');
+            });
+        });
+    });
+
+    function getStatusBadgeClass(status) {
+        switch(status) {
+            case 'upcoming': return 'badge-success';
+            case 'in-progress': return 'badge-info';
+            case 'delayed': return 'badge-warning';
+            default: return 'badge-light';
+        }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Home</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="text-center">Welcome, Dear {{ session["name"] }}!</h1>
+    <p class="text-center lead">Ready to start a new journey with us?.</p>
+
+   <!-- Show Upcoming Flights Option -->
+    <div class="text-center mt-3">
+        <form method="GET" action="{{ url_for('customer_home') }}">
+            <div class="form-group">
+                <label for="show_upcoming">Select Flight View:</label>
+                <select class="form-control" id="show_upcoming" name="show_upcoming">
+                    <option value="I just need the upcoming flight" {% if show_upcoming == 'I just need the upcoming flight' %}selected{% endif %}>I just need the upcoming flight</option>
+                    <option value="I would like to see all my flight" {% if show_upcoming == 'I would like to see all my flight' %}selected{% endif %}>I would like to see all my flight</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Apply</button>
+        </form>
+    </div>
+
+    <!-- My Flights -->
+    <h3 class="mt-5">Your Flights</h3>
+    {% if data %}
+    <div class="table-responsive mt-3">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Airline</th>
+                    <th>Flight Number</th>
+                    <th>Departure Airport</th>
+                    <th>Departure Time</th>
+                    <th>Arrival Airport</th>
+                    <th>Arrival Time</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Ticket ID</th>
+                    <th>Purchase Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    {% for key, value in row.items() %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="alert alert-warning text-center mt-4">
+            No flights found.
+        </div>
+    {% endif %} 
+
+    <!-- Navigation Buttons -->
+    <div class="text-center mt-5">
+        <a href="{{ url_for('search_and_purchase') }}" class="btn btn-info mx-2">Search / Purchase Flights</a>
+        <a href="{{ url_for('customer_spending') }}" class="btn btn-outline-dark mx-2">View Spending</a>
+        <form action="{{ url_for('logout') }}" method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-danger mx-2">Logout</button>
+        </form>
+    </div>
+
+
+<!-- Add Back Button Detection Script -->
+<script>
+  // 页面加载时检测是否是后退
+  if (window.performance && window.performance.navigation.type === 2) {
+      // 如果用户通过后退按钮访问当前页面
+      window.location.reload(true); // 强制刷新页面
+  }
+</script>
+
+
+<!-- Bootstrap Scripts -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>

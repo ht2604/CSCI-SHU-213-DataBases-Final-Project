@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('https://source.unsplash.com/1600x900/?airplane,sky');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .registration-form {
+            padding: 40px;
+        }
+
+        .registration-header {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .registration-header::before {
+            content: "✈️";
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            border-radius: 50px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+        }
+
+        .flash-messages li {
+            font-size: 14px;
+        }
+
+        .form-label {
+            font-weight: bold;
+        }
+        
+        .form-section {
+            display: none;
+        }
+        
+        .form-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="card-body registration-form">
+            <h2 class="registration-header">User Registration</h2>
+            
+            <!-- Flash messages for registration status -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="alert alert-{{ messages[0][0] }} flash-messages">
+                        <ul class="mb-0">
+                        {% for category, message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('register') }}">
+                <!-- Identity Selection -->
+                <div class="form-group">
+                    <label for="identity" class="form-label">Register as:</label>
+                    <select class="form-control" id="identity" name="identity" required>
+                        <option value="">Select...</option>
+                        <option value="customer" {% if identity == 'customer' %}selected{% endif %}>Customer</option>
+                        <option value="agent" {% if identity == 'agent' %}selected{% endif %}>Booking Agent</option>
+                        <option value="staff" {% if identity == 'staff' %}selected{% endif %}>Airline Staff</option>
+                    </select>
+                </div>
+
+                <!-- Customer Form -->
+                <div id="customer-form" class="form-section {% if identity == 'customer' %}active{% endif %}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="email">Email</label>
+                            <input type="email" name="email" class="form-control" {% if identity == 'customer' %}required{% endif %}>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="name">Full Name</label>
+                            <input type="text" name="name" class="form-control" {% if identity == 'customer' %}required{% endif %}>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="password">Password</label>
+                            <input type="password" name="password" class="form-control" {% if identity == 'customer' %}required{% endif %}>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="phone">Phone</label>
+                            <input type="text" name="phone" class="form-control" {% if identity == 'customer' %}required{% endif %}>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="passport_number">Passport Number</label>
+                            <input type="text" name="passport_number" class="form-control" {% if identity == 'customer' %}required{% endif %}>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="passport_expiry">Passport Expiry</label>
+                            <input type="date" name="passport_expiry" class="form-control" {% if identity == 'customer' %}required{% endif %}>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="passport_country">Passport Country</label>
+                            <input type="text" name="passport_country" class="form-control" {% if identity == 'customer' %}required{% endif %}>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="date_of_birth">Date of Birth</label>
+                            <input type="date" name="date_of_birth" class="form-control" {% if identity == 'customer' %}required{% endif %}>
+                        </div>
+
+                        <!-- Optional address fields -->
+                        <div class="col-md-3 mb-3">
+                            <label for="building_number">Building Number</label>
+                            <input type="text" name="building_number" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="street">Street</label>
+                            <input type="text" name="street" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="city">City</label>
+                            <input type="text" name="city" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="state">State</label>
+                            <input type="text" name="state" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 修改Agent表单部分，确保所有字段都有正确的name属性 -->
+                <div id="agent-form" class="form-section {% if identity == 'agent' %}active{% endif %}">
+                    <div class="mb-3">
+                        <label for="agent_email">Email</label>
+                        <input type="text" id="agent_email" name="agent_email" class="form-control" {% if identity == 'agent' %}required{% endif %}>
+                    </div>
+                    <div class="mb-3">
+                        <label for="agent_password">Password</label>
+                        <input type="password" id="agent_password" name="agent_password" class="form-control" {% if identity == 'agent' %}required{% endif %}>
+                    </div>
+                </div>
+
+                <!-- Staff Form -->
+                <div id="staff-form" class="form-section {% if identity == 'staff' %}active{% endif %}">
+                    <div class="mb-3">
+                        <label for="username">Username</label>
+                        <input type="text" name="username" class="form-control" {% if identity == 'staff' %}required{% endif %}>
+                    </div>
+                    <div class="mb-3">
+                        <label for="staff_password">Password</label>
+                        <input type="password" id="staff_password" name="staff_password" class="form-control" {% if identity == 'staff' %}required{% endif %}>
+                    </div>
+                    <div class="mb-3">
+                        <label for="first_name">First Name</label>
+                        <input type="text" name="first_name" class="form-control" {% if identity == 'staff' %}required{% endif %}>
+                    </div>
+                    <div class="mb-3">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" name="last_name" class="form-control" {% if identity == 'staff' %}required{% endif %}>
+                    </div>
+                    <div class="mb-3">
+                        <label for="birthday">Birthday</label>
+                        <input type="date" name="birthday" class="form-control" {% if identity == 'staff' %}required{% endif %}>
+                    </div>
+                    <div class="mb-3">
+                        <label for="airline">Airline</label>
+                        <select name="airline" class="form-control" {% if identity == 'staff' %}required{% endif %}>
+                            <option value="">Select Airline</option>
+                            {% for airline in airline_list %}
+                                <option value="{{ airline[0] }}">{{ airline[0] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block mt-3">{% if identity %}Register{% else %}Continue{% endif %}</button>
+            </form>
+
+            <p class="text-center mt-3">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    
+    <script>
+        // Show/hide form sections based on identity selection
+        $(document).ready(function() {
+            $('#identity').change(function() {
+                $('.form-section').removeClass('active');
+                const selected = $(this).val();
+                if (selected === 'customer') {
+                    $('#customer-form').addClass('active');
+                } else if (selected === 'agent') {
+                    $('#agent-form').addClass('active');
+                } else if (selected === 'staff') {
+                    $('#staff-form').addClass('active');
+                }
+                
+                // Update button text
+                $('button[type="submit"]').text(selected ? 'Register' : 'Continue');
+            });
+        });
+    </script>
+</body>
+</html>

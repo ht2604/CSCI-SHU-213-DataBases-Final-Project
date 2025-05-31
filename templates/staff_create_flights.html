@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Flight</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .status-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border-top: 4px solid #dc3545; /* 红色顶部边框 */
+        }
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+        }
+        .alert-info {
+            background-color: #f8d7da; /* 浅红色背景 */
+            color: #721c24; /* 深红色文字 */
+            border-color: #f5c6cb;
+        }
+        .card-header {
+            background-color: #dc3545 !important; /* 红色头部 */
+        }
+        .btn-primary {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-primary:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+        .btn-outline-secondary:hover {
+            color: #fff;
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Back Button -->
+        <a href="{{ url_for('staff_home') }}" class="btn btn-outline-secondary mb-4">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-plane-departure" style="color: #dc3545;"></i> Create New Flight</h2>
+            <div class="alert alert-info mb-0">
+                <strong>Airline:</strong> {{ session.get('airline', 'Unknown') }}
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="mb-4">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} text-center">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Flight Creation Form -->
+        <div class="card status-card">
+            <div class="card-header text-white">
+                <h5 class="mb-0">Flight Information</h5>
+            </div>
+            <div class="card-body form-section">
+                <form method="POST">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="flight_num">Flight Number</label>
+                            <input type="text" name="flight_num" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="departure_airport">Departure Airport</label>
+                            <select name="departure_airport" class="form-control" required>
+                                {% for a in airports %}
+                                <option value="{{ a }}">{{ a }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="arrival_airport">Arrival Airport</label>
+                            <select name="arrival_airport" class="form-control" required>
+                                {% for a in airports %}
+                                <option value="{{ a }}">{{ a }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="departure_time">Departure Time</label>
+                            <input type="datetime-local" name="departure_time" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="arrival_time">Arrival Time</label>
+                            <input type="datetime-local" name="arrival_time" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="price">Price ($)</label>
+                            <input type="number" name="price" step="0.01" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="airplane_id">Airplane ID</label>
+                            <select name="airplane_id" class="form-control" required>
+                                {% for a in airplanes %}
+                                <option value="{{ a }}">{{ a }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create Flight
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

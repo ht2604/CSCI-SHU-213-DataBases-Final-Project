@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Agent Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+</head>
+<body class="container mt-5">
+
+    <!-- 顶部欢迎与登出按钮 -->
+    <div class="text-center mb-4">
+        <h1 class="mb-3">Welcome, {{ session["username"] }}</h1>
+        <form method="POST" action="{{ url_for('logout') }}" class="d-inline">
+            <button type="submit" class="btn btn-outline-danger">Logout</button>
+        </form>
+    </div>
+
+    <!-- 导航按钮 -->
+    <div class="text-center mb-5">
+        <a href="{{ url_for('agent_search_and_purchase') }}" class="btn btn-primary mx-2">Search & Purchase Flights</a>
+        <a href="{{ url_for('agent_commission') }}" class="btn btn-primary mx-2">View My Commission</a>
+        <a href="{{ url_for('agent_top_customers') }}" class="btn btn-primary mx-2">View Top Customers</a>
+    </div>
+
+    <!-- 搜索表单 -->
+    <h2 class="text-center mb-4">Search Flights You've Purchased for Customers</h2>
+    <form method="POST" class="mb-5">
+        <div class="row mb-3 justify-content-center">
+            <div class="col-md-4">
+                <label class="form-label">Flight Number:</label>
+                <input type="text" name="flight_num" class="form-control">
+            </div>
+        </div>
+        <div class="row mb-3 justify-content-center">
+            <div class="col-md-4">
+                <label class="form-label">Departure City:</label>
+                <input type="text" name="departure_city" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Arrival City:</label>
+                <input type="text" name="arrival_city" class="form-control">
+            </div>
+        </div>
+        <div class="row mb-3 justify-content-center">
+            <div class="col-md-4">
+                <label class="form-label">Departure Date:</label>
+                <input type="date" name="departure_date" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Show Flights:</label>
+                <select name="show_type" class="form-select">
+                    <option value="upcoming">Upcoming Only</option>
+                    <option value="all">All Flights</option>
+                </select>
+            </div>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-success">Search</button>
+        </div>
+    </form>
+
+    {% if flights %}
+        <h3 class="text-center">Flight Results:</h3>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped mt-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Flight #</th>
+                        <th>Airline</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Departure Time</th>
+                        <th>Arrival Time</th>
+                        <th>Status</th>
+                        <th>Customer Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in flights %}
+                    <tr>
+                        <td>{{ f.flight_num }}</td>
+                        <td>{{ f.airline_name }}</td>
+                        <td>{{ f.departure_airport }}</td>
+                        <td>{{ f.arrival_airport }}</td>
+                        <td>{{ f.departure_time }}</td>
+                        <td>{{ f.arrival_time }}</td>
+                        <td>{{ f.status }}</td>
+                        <td>{{ f.customer_email }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-muted text-center">No flights found based on your filters.</p>
+    {% endif %}
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-success mt-4 text-center">
+          {% for msg in messages %}
+            <p class="mb-0">{{ msg }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+
+
+    <!-- Add Back Button Detection Script -->
+    <script>
+      // 页面加载时检测是否是后退
+      if (window.performance && window.performance.navigation.type === 2) {
+          // 如果用户通过后退按钮访问当前页面
+          window.location.reload(true); // 强制刷新页面
+      }
+    </script>
+
+</body>
+</html>
+
+

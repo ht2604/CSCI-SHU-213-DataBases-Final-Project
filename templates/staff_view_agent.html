@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Booking Agents</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .agent-card {
+            transition: transform 0.3s;
+        }
+        .agent-card:hover {
+            transform: translateY(-5px);
+        }
+        .medal {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+        .gold { color: #ffd700; }
+        .silver { color: #c0c0c0; }
+        .bronze { color: #cd7f32; }
+        .flower { font-size: 2rem; color: #ff69b4; }
+        .export-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Navigation -->
+        <div class="d-flex justify-content-between mb-4">
+            <a href="{{ url_for('staff_home') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-user-tie"></i> Top Booking Agents</h2>
+            <div class="alert alert-info mb-0">
+                <strong>Airline:</strong> {{ airline }}
+            </div>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="mb-4">
+            <a href="{{ url_for('view_agents') }}" class="btn btn-outline-secondary">
+                Show Top 5
+            </a>
+            <a href="{{ url_for('view_agents', show_all='true') }}" class="btn btn-outline-primary">
+                Show All
+            </a>
+        </div>
+
+        <!-- Top Agents by Tickets (Past Month) -->
+        <div class="card agent-card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fas fa-ticket-alt"></i> Most Active Agents (Past Month)</h4>
+            </div>
+            <div class="card-body">
+                {% if top_agents_month %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width: 50px">Rank</th>
+                                <th>Agent</th>
+                                <th>Tickets Sold</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for agent in top_agents_month %}
+                            <tr>
+                                <td>
+                                    {% if loop.index == 1 %}
+                                        <i class="fas fa-medal gold medal"></i> <!-- Gold Medal -->
+                                    {% elif loop.index == 2 %}
+                                        <i class="fas fa-medal silver medal"></i> <!-- Silver Medal -->
+                                    {% elif loop.index == 3 %}
+                                        <i class="fas fa-medal bronze medal"></i> <!-- Bronze Medal -->
+                                    {% elif loop.index == 4 %}
+                                        <i class="fas fa-rose flower"></i> <!-- Flower Icon for 4th -->
+                                    {% elif loop.index == 5 %}
+                                        <i class="fas fa-rose flower"></i> <!-- Flower Icon for 5th -->
+                                    {% else %}
+                                        <span class="badge badge-secondary">{{ loop.index }}</span> <!-- For other ranks -->
+                                    {% endif %}
+                                </td>
+                                <td>{{ agent[0] }}</td>
+                                <td>{{ agent[2] }}</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        {% set percentage = (agent[2] / top_agents_month[0][1]) * 100 %}
+                                        <div class="progress-bar bg-success" 
+                                             role="progressbar" 
+                                             style="width: {{ percentage }}%" 
+                                             aria-valuenow="{{ percentage }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                            {{ "%.0f"|format(percentage) }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">No agent data available for the past month</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Top Agents by Tickets (Past Year) -->
+        <div class="card agent-card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-ticket-alt"></i> Most Active Agents (Past Year)</h4>
+            </div>
+            <div class="card-body">
+                {% if top_agents_year %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width: 50px">Rank</th>
+                                <th>Agent</th>
+                                <th>Tickets Sold</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for agent in top_agents_year %}
+                            <tr>
+                                <td>
+                                    {% if loop.index == 1 %}
+                                        <i class="fas fa-medal gold medal"></i> <!-- Gold Medal -->
+                                    {% elif loop.index == 2 %}
+                                        <i class="fas fa-medal silver medal"></i> <!-- Silver Medal -->
+                                    {% elif loop.index == 3 %}
+                                        <i class="fas fa-medal bronze medal"></i> <!-- Bronze Medal -->
+                                    {% elif loop.index == 4 %}
+                                        <i class="fas fa-rose flower"></i> <!-- Flower Icon for 4th -->
+                                    {% elif loop.index == 5 %}
+                                        <i class="fas fa-rose flower"></i> <!-- Flower Icon for 5th -->
+                                    {% else %}
+                                        <span class="badge badge-secondary">{{ loop.index }}</span> <!-- For other ranks -->
+                                    {% endif %}
+                                </td>
+                                <td>{{ agent[0] }}</td>
+                                <td>{{ agent[2] }}</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        {% set percentage = (agent[2] / top_agents_year[0][1]) * 100 %}
+                                        <div class="progress-bar bg-primary" 
+                                             role="progressbar" 
+                                             style="width: {{ percentage }}%" 
+                                             aria-valuenow="{{ percentage }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                            {{ "%.0f"|format(percentage) }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">No agent data available for the past year</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Top Agents by Commission (Past Year) -->
+        <div class="card agent-card">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0"><i class="fas fa-dollar-sign"></i> Agents by Commission (Past Year)</h4>
+            </div>
+            <div class="card-body">
+                {% if top_agents_commission %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width: 50px">Rank</th>
+                                <th>Agent</th>
+                                <th>Commission Earned</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for agent in top_agents_commission %}
+                            <tr>
+                                <td>
+                                    {% if loop.index == 1 %}
+                                        <i class="fas fa-medal gold medal"></i> <!-- Gold Medal -->
+                                    {% elif loop.index == 2 %}
+                                        <i class="fas fa-medal silver medal"></i> <!-- Silver Medal -->
+                                    {% elif loop.index == 3 %}
+                                        <i class="fas fa-medal bronze medal"></i> <!-- Bronze Medal -->
+                                    {% elif loop.index == 4 %}
+                                        <i class="fas fa-rose flower"></i> <!-- Flower Icon for 4th -->
+                                    {% elif loop.index == 5 %}
+                                        <i class="fas fa-rose flower"></i> <!-- Flower Icon for 5th -->
+                                    {% else %}
+                                        <span class="badge badge-secondary">{{ loop.index }}</span> <!-- For other ranks -->
+                                    {% endif %}
+                                </td>
+                                <td>{{ agent[0] }}</td>
+                                <td>${{ "%.2f"|format(agent[2]) }}</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        {% set percentage = (agent[2] / top_agents_commission[0][2]) * 100 %}
+                                        <div class="progress-bar bg-warning" 
+                                             role="progressbar" 
+                                             style="width: {{ percentage }}%" 
+                                             aria-valuenow="{{ percentage }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                            {{ "%.0f"|format(percentage) }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">No commission data available for the past year</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Export to Excel Button -->
+    <button id="exportExcel" class="btn btn-success export-btn" title="Export to Excel">
+        <i class="fas fa-file-excel"></i> Export
+    </button>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sheetjs/xlsx.full.min.js"></script>
+    
+    <script>
+        document.getElementById('exportExcel').addEventListener('click', function() {
+            // Create a new workbook
+            var wb = XLSX.utils.book_new();
+            
+            // Function to export a table to a worksheet
+            function exportTableToSheet(tableId, sheetName) {
+                var table = document.querySelector(tableId);
+                if (table) {
+                    var ws = XLSX.utils.table_to_sheet(table);
+                    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+                }
+            }
+            
+            // Export all tables
+            exportTableToSheet('.card:nth-child(4) table', 'Monthly Agents');
+            exportTableToSheet('.card:nth-child(5) table', 'Yearly Agents');
+            exportTableToSheet('.card:nth-child(6) table', 'Commission Agents');
+            
+            // Generate the Excel file
+            XLSX.writeFile(wb, 'Top_Booking_Agents.xlsx');
+        });
+    </script>
+</body>
+</html>

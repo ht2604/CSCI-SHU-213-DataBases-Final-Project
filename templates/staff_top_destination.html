@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Destinations - Airline Staff</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .destination-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .rank-badge {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #0d6efd;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .destination-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #0d6efd;
+        }
+        .time-period {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <h2 class="text-center">Top Destinations</h2>
+                <p class="text-center text-muted">Most popular destinations for your airline</p>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="row mb-4">
+            <div class="col">
+                <a href="{{ url_for('staff_home') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Last 3 Months Destinations -->
+<div class="row mb-4">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-calendar-alt"></i> Top 3 Destinations - Last 3 Months
+            </div>
+            <div class="card-body">
+                {% if destination_month %}
+                    <div class="row">
+                        {% for dest in destination_month %}
+                        <div class="col-md-4">
+                            <div class="destination-card position-relative">
+                                <div class="rank-badge">{{ loop.index }}</div>
+                                <div class="destination-icon">
+                                    <i class="fas fa-plane-arrival"></i>
+                                </div>
+                                <h4>{{ dest[1] }}</h4>
+                                <p class="text-muted">{{ dest[0] }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        No destination data available for the last 3 months.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Last Year Destinations -->
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <i class="fas fa-calendar"></i> Top 3 Destinations - Last Year
+            </div>
+            <div class="card-body">
+                {% if destination_year %}
+                    <div class="row">
+                        {% for dest in destination_year %}
+                        <div class="col-md-4">
+                            <div class="destination-card position-relative">
+                                <div class="rank-badge">{{ loop.index }}</div>
+                                <div class="destination-icon">
+                                    <i class="fas fa-plane-arrival"></i>
+                                </div>
+                                <h4>{{ dest[1] }}</h4>
+                                <p class="text-muted">{{ dest[0] }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        No destination data available for the last year.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

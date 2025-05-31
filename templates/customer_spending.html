@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Spending</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="text-center">Track My Spending</h1>
+
+    {% if spendings %}
+        <p class="mt-4">Total spending in past 12 months: <strong id="spending_12m"></strong></p>
+        <p>Spending in selected range: <strong id="spending_select"></strong></p>
+
+        <div class="form-inline my-3">
+            <label for="start" class="mr-2">Start Month:</label>
+            <input type="month" id="start" name="start" class="form-control mr-4" value="{{ past6m }}">
+
+            <label for="end" class="mr-2">End Month:</label>
+            <input type="month" id="end" name="end" class="form-control" value="{{ now }}">
+        </div>
+
+        <p id="error" class="text-danger"></p>
+
+        <!-- Chart -->
+        <canvas id="myChart" class="mt-4"></canvas>
+
+        <script>
+            Chart.scaleService.updateScaleDefaults('linear', {ticks: {min: 0}});
+            var months = {{ months }};
+            var spendings = {{ spendings }};
+            var year_total = 0;
+            
+            for (var i = Math.max(months.length - 12, 0); i < months.length; i++) {
+                year_total += spendings[i];
+            }
+            document.getElementById("spending_12m").innerHTML = year_total;
+
+            chart = make();
+
+            document.getElementById("start").oninput = function(){update(chart);};
+            document.getElementById("end").oninput = function(){update(chart);};
+
+            function make(){
+                let select_total = 0;
+                let start = document.getElementById("start").value;
+                let end = document.getElementById("end").value;
+                let y, m;
+                let select_months = [];
+                let select_spendings = [];
+
+                try {
+                    start_year = +start.slice(0,4);
+                    start_month = +start.slice(5,7);
+                    end_year = +end.slice(0,4);
+                    end_month = +end.slice(5,7);
+
+                    if (start_year*100+start_month > end_year*100+end_month){
+                        throw "error";
+                    }
+
+                    y = start_year;
+                    m = start_month;
+
+                    while (y*100+m <= end_year*100+end_month){
+                        select_months.push(y + "-" + m);
+                        select_spendings.push(0);
+                        for (var i = 0; i < months.length; i++) {
+                            if (months[i] === y*100+m){
+                                select_spendings[select_spendings.length-1] = spendings[i];
+                                select_total += spendings[i];
+                            }
+                        }
+                        m++;
+                        if (m == 13){
+                            m = 1;
+                            y++;
+                        }
+                    }
+                    document.getElementById("spending_select").innerHTML = select_total;
+
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    var chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: select_months,
+                            datasets: [{
+                                label: 'Monthly Spending',
+                                backgroundColor: 'steelblue',
+                                data: select_spendings
+                            }]
+                        },
+                        options: {
+                            title: {
+                                display: true,
+                                text: 'Monthly Spendings',
+                                fontSize: 20
+                            },
+                            animation: {duration: 0}
+                        }
+                    });
+                }
+                catch {
+                    document.getElementById("error").innerHTML = "Error. Please check your input.";
+                }
+                return chart;
+            }
+
+            function update(chart){
+                let select_total = 0;
+                document.getElementById("error").innerHTML = "";
+                let start = document.getElementById("start").value;
+                let end = document.getElementById("end").value;
+                let y, m;
+                let select_months = [];
+                let select_spendings = [];
+
+                try {
+                    start_year = +start.slice(0,4);
+                    start_month = +start.slice(5,7);
+                    end_year = +end.slice(0,4);
+                    end_month = +end.slice(5,7);
+
+                    if (start_year*100+start_month > end_year*100+end_month){
+                        throw "error";
+                    }
+
+                    y = start_year;
+                    m = start_month;
+
+                    while (y*100+m <= end_year*100+end_month){
+                        select_months.push(y + "-" + m);
+                        select_spendings.push(0);
+                        for (var i = 0; i < months.length; i++) {
+                            if (months[i] === y*100+m){
+                                select_spendings[select_spendings.length-1] = spendings[i];
+                                select_total += spendings[i];
+                            }
+                        }
+                        m++;
+                        if (m == 13){
+                            m = 1;
+                            y++;
+                        }
+                    }
+                    document.getElementById("spending_select").innerHTML = select_total;
+
+                    chart.data.labels = select_months;
+                    chart.data.datasets[0].data = select_spendings;
+                    chart.update();
+                }
+                catch {
+                    document.getElementById("error").innerHTML = "Error. Please check your input.";
+                }
+            }
+        </script>
+
+    {% else %}
+        <div class="alert alert-warning text-center mt-4">
+            No spending records available.
+        </div>
+    {% endif %}
+
+    <!-- Back to Home Button -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('customer_home') }}" class="btn btn-secondary">Back to Customer Home</a>
+    </div>
+</div>
+
+<!-- Bootstrap Scripts -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>

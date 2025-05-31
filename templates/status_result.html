@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Status Results</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="text-center">Flight Status Results</h1>
+
+
+
+    
+    {% if no_flight %}
+        <div class="alert alert-warning text-center">
+            No upcoming flights based on your search.
+        </div>
+    {% else %}
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Flight Number</th>
+                    <th>Status</th>
+                    <th>Scheduled Departure</th>
+                    <th>Scheduled Arrival</th>
+                    <th>Current Location</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in flight_status %}
+                <tr>
+                    <td>{{ status.flight_number }}</td>
+                    <td>{{ status.status }}</td>
+                    <td>{{ status.scheduled_departure }}</td>
+                    <td>{{ status.scheduled_arrival }}</td>
+                    <td>{{ status.current_location }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+   
+
+    {% endif %}
+
+    <!-- Redirect to home button -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Redirect to Initial Page</a>
+    </div>
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Top Customers</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-4">
+
+    <!-- 返回主页按钮 -->
+    <div class="mb-4">
+        <a href="{{ url_for('agent_home') }}" class="btn btn-primary">
+            ← Return to Home
+        </a>
+    </div>
+
+    <h1 class="mb-4">Top 5 Customers</h1>
+
+    <h2>By Ticket Count (Past 6 Months)</h2>
+    {% if top_ticket_customers %}
+        <div class="table-responsive mb-5">
+            <table class="table table-bordered table-striped mt-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Customer Email</th>
+                        <th>Tickets Purchased</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in top_ticket_customers %}
+                    <tr>
+                        <td>{{ row.customer_email }}</td>
+                        <td>{{ row.ticket_count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-muted">No data found for the past 6 months.</p>
+    {% endif %}
+
+    <h2>By Commission (Past 1 Year)</h2>
+    {% if top_commission_customers %}
+        <div class="table-responsive mb-5">
+            <table class="table table-bordered table-striped mt-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Customer Email</th>
+                        <th>Total Commission ($)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in top_commission_customers %}
+                    <tr>
+                        <td>{{ row.customer_email }}</td>
+                        <td>{{ "%.2f"|format(row.total_commission) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-muted">No commission data found for the past year.</p>
+    {% endif %}
+
+</body>
+</html>
+

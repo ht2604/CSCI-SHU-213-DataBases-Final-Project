@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Management</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+        .back-btn {
+            margin-bottom: 20px;
+        }
+        .customer-modal-btn {
+            padding: 2px 8px;
+            font-size: 12px;
+        }
+        .export-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Back to Home Button -->
+        <a href="{{ url_for('staff_home') }}" class="btn btn-secondary back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Flight Management</h2>
+            <div class="alert alert-info mb-0">
+                <strong>Airline:</strong> {{ session.get('airline', 'Unknown') }}
+            </div>
+        </div>
+
+        <!-- Flight Filter Section -->
+        <div class="filter-section">
+            <form method="GET" action="{{ url_for('view_flights') }}">
+                <div class="form-row">
+                    <div class="col-md-3 form-group">
+                        <label for="time_range">Time Range</label>
+                        <select class="form-control" id="time_range" name="time_range">
+                            <option value="upcoming" {% if time_range == 'upcoming' %}selected{% endif %}>Upcoming (next 30 days)</option>
+                            <option value="current" {% if time_range == 'current' %}selected{% endif %}>Current</option>
+                            <option value="past" {% if time_range == 'past' %}selected{% endif %}>Past</option>
+                            <option value="all" {% if time_range == 'all' %}selected{% endif %}>All Flights</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3 form-group">
+                        <label for="departure_airport">Departure Airport</label>
+                        <input type="text" class="form-control" id="departure_airport" name="departure_airport" 
+                               value="{{ request.args.get('departure_airport', '') }}" placeholder="All airports">
+                    </div>
+                    
+                    <div class="col-md-3 form-group">
+                        <label for="arrival_airport">Arrival Airport</label>
+                        <input type="text" class="form-control" id="arrival_airport" name="arrival_airport" 
+                               value="{{ request.args.get('arrival_airport', '') }}" placeholder="All airports">
+                    </div>
+                    
+                    <div class="col-md-3 form-group d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary btn-block">Filter Flights</button>
+                    </div>
+                </div>
+                
+                <div class="form-row mt-2">
+                    <div class="col-md-6 form-group">
+                        <label for="date_from">Date From</label>
+                        <input type="date" class="form-control" id="date_from" name="date_from" 
+                               value="{{ request.args.get('date_from', '') }}">
+                    </div>
+                    
+                    <div class="col-md-6 form-group">
+                        <label for="date_to">Date To</label>
+                        <input type="date" class="form-control" id="date_to" name="date_to" 
+                               value="{{ request.args.get('date_to', '') }}">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Flight List -->
+        <h4 class="mb-3">Flight List</h4>
+        
+        {% if flights %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="flightTable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Flight #</th>
+                        <th>Departure</th>
+                        <th>Arrival</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Passengers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for flight in flights %}
+                    <tr>
+                        <td>{{ flight.flight_num }}</td>
+                        <td>
+                            {{ flight.departure_airport }}<br>
+                            <small>{{ flight.departure_time.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </td>
+                        <td>
+                            {{ flight.arrival_airport }}<br>
+                            <small>{{ flight.arrival_time.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </td>
+                        <td>
+                            {{ flight.departure_time.strftime('%H:%M') }} - 
+                            {{ flight.arrival_time.strftime('%H:%M') }}
+                        </td>
+                        <td>
+                            <span class="badge 
+                                {% if flight.status == 'On Time' %}badge-success
+                                {% elif flight.status == 'Delayed' %}badge-warning
+                                {% elif flight.status == 'Cancelled' %}badge-danger
+                                {% else %}badge-info{% endif %}">
+                                {{ flight.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-info customer-modal-btn" 
+                                    data-toggle="modal" data-target="#customersModal"
+                                    data-flight="{{ flight.flight_num }}"
+                                    data-date="{{ flight.departure_time.strftime('%Y-%m-%d') }}">
+                                View ({{ flight.passenger_count }})
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-warning text-center">
+            No flights found matching your criteria.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Customers Modal -->
+    <div class="modal fade" id="customersModal" tabindex="-1" role="dialog" aria-labelledby="customersModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customersModalLabel">Passenger List - Flight <span id="modalFlightNumber"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Ticket #</th>
+                                <th>Purchase Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customerList">
+                            <!-- Customers will be loaded here via AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export to Excel Button -->
+    <button id="exportExcel" class="btn btn-success export-btn" title="Export to Excel">
+        <i class="fas fa-file-excel"></i> Export
+    </button>
+
+    <!-- Bootstrap & jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sheetjs/xlsx.full.min.js"></script>
+    
+    <script>
+    $(document).ready(function() {
+        // Load customer data when modal opens
+        $('#customersModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var flightNum = button.data('flight');
+            var flightDate = button.data('date');
+            
+            $('#modalFlightNumber').text(flightNum + ' (' + flightDate + ')');
+            
+            // AJAX call to get customer data
+            $.get('/flight_customers?flight_num=' + flightNum + '&date=' + flightDate, function(data) {
+                $('#customerList').html(data);
+            });
+        });
+
+        // Export to Excel functionality
+        document.getElementById('exportExcel').addEventListener('click', function() {
+            // Create a new workbook
+            var wb = XLSX.utils.book_new();
+            
+            // Export main flight table
+            var flightTable = document.getElementById('flightTable');
+            if (flightTable) {
+                var ws = XLSX.utils.table_to_sheet(flightTable);
+                XLSX.utils.book_append_sheet(wb, ws, "Flights");
+            }
+            
+            // Generate the Excel file
+            XLSX.writeFile(wb, 'Flight_Management_Report.xlsx');
+        });
+    });
+    </script>
+</body>
+</html>
